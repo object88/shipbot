@@ -4,6 +4,9 @@ set -e
 cd $(dirname "$0")
 CWD=$(pwd)
 
+mkdir -p bin
+mkdir -p mocks
+
 # Use this to ensure that we have all the tools required to do a build.
 export CGO_ENABLED=0
 export GO111MODULE=on
@@ -49,7 +52,7 @@ if ! [ -z "$(git status --porcelain)" ]; then
 fi
 
 echo "Build version '$VERSION', git SHA '$GIT_COMMIT'"
-LDFLAGS_IMPORTS="-X github.com/object88/tugboat.GitCommit=${GIT_COMMIT} -X github.com/object88/tugboat.AppVersion=${VERSION}"
+LDFLAGS_IMPORTS="-X github.com/object88/shipbot.GitCommit=${GIT_COMMIT} -X github.com/object88/shipbot.AppVersion=${VERSION}"
 
 cd "$CWD"
 
@@ -140,7 +143,7 @@ fi
 for PLATFORM in "${PLATFORMS[@]}"; do
   export GOOS=$(cut -d'/' -f1 <<< $PLATFORM)
   export GOARCH=$(cut -d'/' -f2 <<< $PLATFORM)
-  BINARY_NAME="tugboat-${GOOS}-${GOARCH}"
+  BINARY_NAME="shipbot-${GOOS}-${GOARCH}"
   if [ $DEFAULT_GOOS == $GOOS ]; then
     export TEST_BINARY_NAME="$CWD/bin/$BINARY_NAME"
   fi

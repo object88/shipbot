@@ -3,19 +3,31 @@ package cmd
 import (
 	"strings"
 
-	cmdflags "github.com/object88/shipbot/cmd/flags"
+	"github.com/object88/shipbot/cmd/common"
+	"github.com/object88/shipbot/cmd/query"
+	"github.com/object88/shipbot/cmd/serve"
+	"github.com/object88/shipbot/cmd/traverse"
+	"github.com/object88/shipbot/cmd/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // InitializeCommands sets up the cobra commands
 func InitializeCommands() *cobra.Command {
-	rootCmd := createRootCommand()
+	ca, rootCmd := createRootCommand()
+
+	rootCmd.AddCommand(
+		query.CreateCommand(ca),
+		serve.CreateCommand(ca),
+		version.CreateCommand(),
+	)
 
 	return rootCmd
 }
 
-func createRootCommand() *cobra.Command {
+func createRootCommand() (*common.CommonArgs, *cobra.Command) {
+	ca := common.NewCommonArgs()
+
 	cmd := &cobra.Command{
 		Use: "shipbot",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
@@ -33,12 +45,7 @@ func createRootCommand() *cobra.Command {
 	viper.SetEnvPrefix("SHIPBOT")
 
 	flags := cmd.Flags()
+	ca.Setup(flags)
 
-	flags.String(cmdflags.SlackboyKey, "", "Slack token")
-	viper.BindPFlag(cmdflags.SlackboyKey, flags.Lookup(cmdflags.SlackboyKey))
-
-	flags.BoolP(cmdflags.VerboseKey, "v", false, "Emit debug messages")
-	viper.BindPFlag(cmdflags.VerboseKey, flags.Lookup(cmdflags.VerboseKey))
-
-	return cmd
+	return ca, traverse.TraverseRunHooks(cmd)
 }
