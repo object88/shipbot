@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto;
+
+service Shipbot {
+  rpc ListClusters (ListClustersRequest) returns (stream ListClustersResponse) {}
+}
+
+message ListClustersRequest {
+  string filter = 1;
+}
+
+message ListClustersResponse {
+  string name = 1;
+}

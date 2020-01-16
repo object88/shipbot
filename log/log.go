@@ -13,11 +13,11 @@ const (
 	// Error means that only errors will be written
 	Error Level = iota
 
-	// Info logging writes info, warning, and error
-	Info
-
-	// Verbose logs everything bug debug-level messages
+	// Verbose logging writes verbose and and error
 	Verbose
+
+	// Debug logs everything
+	Debug
 )
 
 // Log is a fairly basic logger
@@ -59,7 +59,7 @@ func (l *Log) Infof(msg string, v ...interface{}) {
 		l = Stdout()
 	}
 
-	l.writeIf(Info, msg, v...)
+	l.writeIf(Verbose, msg, v...)
 }
 
 // Printf will always log the given message, regardless of log level set.
@@ -69,7 +69,7 @@ func (l *Log) Printf(msg string, v ...interface{}) {
 		l = Stdout()
 	}
 
-	l.write(Verbose, msg, v...)
+	l.write(Debug, msg, v...)
 }
 
 // SetLevel will adjust the logger's level.  If the pointer receiver is nil,
@@ -89,7 +89,7 @@ func (l *Log) Verbosef(msg string, v ...interface{}) {
 		l = Stdout()
 	}
 
-	l.writeIf(Verbose, msg, v...)
+	l.writeIf(Debug, msg, v...)
 }
 
 func (l *Log) writeIf(lvl Level, msg string, v ...interface{}) {

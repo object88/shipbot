@@ -6,6 +6,9 @@ import (
 )
 
 const (
+	// DebugKey turns on debug output to STDERR.  Implies verbose.
+	DebugKey = "debug"
+
 	// OutputKey determines the output format
 	OutputKey = "output"
 

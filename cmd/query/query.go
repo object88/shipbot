@@ -1,28 +1,22 @@
 package query
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/object88/shipbot/client"
 	"github.com/object88/shipbot/cmd/common"
 	"github.com/object88/shipbot/cmd/traverse"
-	"github.com/object88/shipbot/query"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/cli"
-	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
 type command struct {
 	cobra.Command
 	*common.CommonArgs
 
-	cflags *genericclioptions.ConfigFlags
+	// cflags *genericclioptions.ConfigFlags
 
-	q query.Querier
+	c *client.Client
 
-	actionConfig *action.Configuration
+	// actionConfig *action.Configuration
 }
 
 // CreateCommand returns the version command
@@ -43,53 +37,55 @@ func CreateCommand(ca *common.CommonArgs) *cobra.Command {
 		CommonArgs: ca,
 	}
 
-	flgs := c.Flags()
+	// flgs := c.Flags()
 
-	c.cflags = genericclioptions.NewConfigFlags(false)
-	c.cflags.AddFlags(flgs)
+	// c.cflags = genericclioptions.NewConfigFlags(false)
+	// c.cflags.AddFlags(flgs)
 
 	return traverse.TraverseRunHooks(&c.Command)
 }
 
 func (c *command) Preexecute(cmd *cobra.Command, args []string) error {
-	opts := []query.Option{
-		query.SetLogger(c.Logger),
+	opts := []client.Option{
+		client.SetLogger(c.Logger),
 	}
 
 	var err error
-	c.q, err = query.New(opts...)
+	c.c, err = client.New(opts...)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to instantiate querier")
+		return errors.Wrapf(err, "Failed to instantiate client")
 	}
 
-	helmDriver := os.Getenv("HELM_DRIVER")
-	settings := cli.New()
+	// helmDriver := os.Getenv("HELM_DRIVER")
+	// settings := cli.New()
 
-	c.actionConfig = &action.Configuration{}
-	err = c.actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), helmDriver, c.Logger.Infof)
-	if err != nil {
-		return errors.Wrapf(err, "Failed to init actionConfig")
-	}
+	// c.actionConfig = &action.Configuration{}
+	// err = c.actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), helmDriver, c.Logger.Infof)
+	// if err != nil {
+	// 	return errors.Wrapf(err, "Failed to init actionConfig")
+	// }
 
 	return nil
 }
 
 func (c *command) Execute(cmd *cobra.Command, args []string) error {
-	name := args[0]
-	releases, err := c.actionConfig.Releases.History(name)
-	if err != nil {
-		return errors.Wrapf(err, "Failed to get chart foo")
-	}
+	c.c.Foo()
 
-	if len(releases) == 0 {
-		return nil
-	}
-
-	r := releases[0]
-	fmt.Printf("Chart: %s  %s", r.Chart.Metadata.Name, r.Chart.Metadata.Version)
-	// for _, d := range r.Chart.Dependencies() {
-
+	// name := args[0]
+	// releases, err := c.actionConfig.Releases.History(name)
+	// if err != nil {
+	// 	return errors.Wrapf(err, "Failed to get chart foo")
 	// }
+
+	// if len(releases) == 0 {
+	// 	return nil
+	// }
+
+	// r := releases[0]
+	// fmt.Printf("Chart: %s  %s", r.Chart.Metadata.Name, r.Chart.Metadata.Version)
+	// // for _, d := range r.Chart.Dependencies() {
+
+	// // }
 
 	return nil
 }

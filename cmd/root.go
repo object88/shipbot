@@ -31,6 +31,7 @@ func createRootCommand() (*common.CommonArgs, *cobra.Command) {
 	cmd := &cobra.Command{
 		Use: "shipbot",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			ca.Evaluate()
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
@@ -44,7 +45,7 @@ func createRootCommand() (*common.CommonArgs, *cobra.Command) {
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.SetEnvPrefix("SHIPBOT")
 
-	flags := cmd.Flags()
+	flags := cmd.PersistentFlags()
 	ca.Setup(flags)
 
 	return ca, traverse.TraverseRunHooks(cmd)

@@ -27,10 +27,9 @@ check() {
 
 check git
 check go
-check helm
 check jq
 check kubectl
-# check zip
+check protoc
 
 if ! [ ${#MISSING[@]} -eq 0 ]; then
   echo "Missing prerequisites:"
@@ -130,6 +129,9 @@ fi
 
 # build executable(s)
 # method found here https://www.digitalocean.com/community/tutorials/how-to-build-go-executables-for-multiple-platforms-on-ubuntu-16-04
+
+echo "Building protoful"
+protoc -I proto proto/shipbot.proto --go_out=plugins=grpc:proto
 
 echo "Building..."
 

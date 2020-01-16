@@ -16,14 +16,20 @@ func NewCommonArgs() *CommonArgs {
 }
 
 func (ca *CommonArgs) Setup(flags *pflag.FlagSet) {
-	flags.BoolP(cmdflags.VerboseKey, "v", false, "Emit debug messages")
+	flags.Bool(cmdflags.DebugKey, false, "Emit debug messages; implies verbiose")
+	viper.BindPFlag(cmdflags.DebugKey, flags.Lookup(cmdflags.DebugKey))
+
+	flags.Bool(cmdflags.VerboseKey, false, "Emit verbose messages")
 	viper.BindPFlag(cmdflags.VerboseKey, flags.Lookup(cmdflags.VerboseKey))
 }
 
 func (ca *CommonArgs) Evaluate() error {
-	verbose := viper.GetBool(cmdflags.VerboseKey)
-	if verbose {
-		ca.Logger = log.Stderr()
+	ca.Logger = log.Stderr()
+	if viper.GetBool(cmdflags.VerboseKey) {
+		ca.Logger.SetLevel(log.Verbose)
+	}
+	if viper.GetBool(cmdflags.DebugKey) {
+		ca.Logger.SetLevel(log.Debug)
 	}
 
 	return nil
